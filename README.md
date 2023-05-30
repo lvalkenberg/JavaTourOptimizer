@@ -7,6 +7,6 @@ This repository is a Java solver for the Travelling Salesman Problem ([TSP](http
 
 ## Exemple
 
-## Licence
+## License
 
 The source code for the site is licensed under the MIT license, which you can find in the [LICENSE.txt](LICENSE.txt) file.
