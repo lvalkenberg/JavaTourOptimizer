@@ -1,6 +1,5 @@
-package artifacts;
+package experiment;
 
-import other.soTSP;
 import core.TSP;
 
 public class Solver {
@@ -42,8 +41,10 @@ public class Solver {
             Long time = System.currentTimeMillis();
             TSP tsp = new TSP(tspSolver, filePath);
             tsp.solve();
-            System.out.println(System.currentTimeMillis() - time);
-        }catch (Exception e){
+            System.out.print(System.currentTimeMillis() - time);
+            System.out.print(' ');
+            System.out.print(tsp.visitedNodeCounter);
+        } catch (Exception e) {
             System.out.println(e);
         }
 

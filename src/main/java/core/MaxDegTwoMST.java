@@ -2,19 +2,19 @@ package core;
 
 import util.UF;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Stack;
 
-/**
- * Algorithhms 4th Edition by Robert Sedgewick, Kevin Wayne
- */
-public class KruskalCCT {
+public class MaxDegTwoMST {
     double[][] distanceMatrix;
-    int[][] mandatoryEdges;
-    ArrayList<Edge> mst;
+    int size;
     double cost;
     int[] nodesDegree;
+    int[][] mandatoryEdges;
+    ArrayList<Edge> mst;
     CCTree ccTree;
-    int size;
     int[] parent;
     boolean inconsistent = false;
     Edge[] edgeArray;
@@ -28,7 +28,7 @@ public class KruskalCCT {
      *
      * @param size size of the graph
      */
-    public KruskalCCT(int size) {
+    public MaxDegTwoMST(int size) {
         this.size = size;
         this.nodesDegree = new int[size];
         this.cost = 0;
@@ -50,7 +50,7 @@ public class KruskalCCT {
      * @param distanceMatrix distance matrix used to compute the MST
      * @param mandatoryEdges mandatory edges to include in the MST
      */
-    public KruskalCCT(double[][] distanceMatrix, int[][] mandatoryEdges) {
+    public MaxDegTwoMST(double[][] distanceMatrix, int[][] mandatoryEdges) {
         this.distanceMatrix = distanceMatrix;
         this.mandatoryEdges = mandatoryEdges;
         this.size = distanceMatrix.length;
@@ -66,14 +66,51 @@ public class KruskalCCT {
         }
         this.uf = new UF(size);
         this.mst = new ArrayList<>();
-        computeMST();
+        computeMST(5);
     }
 
     /**
      * Compute the mst based on the distance matrix, including
-     * the mandatory edges. Based on the Kruskal MST algorithm
+     * the mandatory edges. Based on the Boruvka MST algorithm
+     *
+     * @param distanceMatrix distance matrix used to compute the MST
+     * @param mandatoryEdges mandatory edges to include in the MST
+     * @param rootEdges      Edges on the root of the 1-tree took in account to
+     *                       maximise the number of degree-2 nodes
      */
-    public void computeMST(double[][] distanceMatrix, int[][] mandatoryEdges) {
+    public MaxDegTwoMST(double[][] distanceMatrix, int[][] mandatoryEdges, int[] rootEdges) {
+        this.distanceMatrix = distanceMatrix;
+        this.mandatoryEdges = mandatoryEdges;
+        this.size = distanceMatrix.length;
+        this.nodesDegree = new int[size];
+        this.cost = 0;
+        this.parent = new int[size];
+        this.visited = new boolean[size];
+        this.edgeArray = new Edge[size * size];
+        for (int i = 0; i < distanceMatrix.length; i++) {
+            for (int j = i + 1; j < distanceMatrix.length; j++) {
+                edgeArray[i + j * size] = new Edge(i, j, 0);
+            }
+        }
+        this.uf = new UF(size);
+        this.mst = new ArrayList<>();
+
+        nodesDegree[rootEdges[0]] += 1;
+        nodesDegree[rootEdges[1]] += 1;
+
+        computeMST(5);
+    }
+
+    /**
+     * Compute the mst based on the distance matrix, including
+     * the mandatory edges. Based on the Boruvka MST algorithm
+     *
+     * @param distanceMatrix distance matrix used to compute the MST
+     * @param mandatoryEdges mandatory edges to include in the MST
+     * @param rootEdges      Edges on the root of the 1-tree took in account to
+     *                       maximise the number of degree-2 nodes
+     */
+    public void computeMST(double[][] distanceMatrix, int[][] mandatoryEdges, int[] rootEdges) {
         this.distanceMatrix = distanceMatrix;
         this.mandatoryEdges = mandatoryEdges;
         for (int i = 0; i < size; i++) {
@@ -84,36 +121,100 @@ public class KruskalCCT {
         this.inconsistent = false;
         this.cost = 0;
         this.uf.reset();
-        computeMST();
+
+        nodesDegree[rootEdges[0] - 1] += 1;
+        nodesDegree[rootEdges[1] - 1] += 1;
+
+        computeMST(5);
     }
 
     /**
      * Compute the mst based on the distance matrix, including
-     * the mandatory edges. Based on the Kruskal MST algorithm
+     * the mandatory edges. Based on the Boruvka MST algorithm
+     *
+     * @param alt alternative of how the equally ranked safe
+     *            edges should be sorted. Default use 5
      */
-    public void computeMST() {
-        // new object each time !
+    private void computeMST(int alt) {
         mst.clear();
-        PriorityQueue<Edge> pq = new PriorityQueue<>();
-        //add each edge in the pq
+        uf.reset();
+
+        // update edges weight
         for (int i = 0; i < distanceMatrix.length; i++) {
             for (int j = i + 1; j < distanceMatrix.length; j++) {
                 edgeArray[i + j * size].weight = distanceMatrix[i][j];
-                pq.add(edgeArray[i + j * size]);
             }
         }
 
         addMandatoryEdges();
-        if (inconsistent) return;
 
-        while (!pq.isEmpty() && mst.size() < distanceMatrix.length - 1) {
-            Edge e = pq.poll();
-            if (uf.connected(e.v, e.w)) continue;
-            //ccTree.updateCCTree(uf.find(e.v), uf.find(e.w), e);
-            uf.union(e.v, e.w);
-            addEdge(e);
+        for (int t = 1; t < size && mst.size() < size - 1; t *= 2) { // O(log(V))
+            //Edge[] closest = new Edge[graphSize];
+            ArrayList<Edge>[] closest = new ArrayList[size];
+            for (int i = 0; i < size; i++) {
+                closest[i] = new ArrayList<>();
+            }
+            Edge[] lowerWeight = new Edge[size];
+            for (int v = 0; v < size; v++) { // O(V^2)
+                for (int w = v + 1; w < size; w++) {
+                    int i = uf.find(v), j = uf.find(w);
+                    if (i == j) continue;
+                    Edge e = edgeArray[v + w * size];
+                    if (lowerWeight[i] == null || e.compareTo(lowerWeight[i]) < 0) lowerWeight[i] = e;
+                    if (lowerWeight[j] == null || e.compareTo(lowerWeight[j]) < 0) lowerWeight[j] = e;
+                }
+            }
+
+            for (int v = 0; v < size; v++) {// O(V^2)
+                for (int w = v + 1; w < size; w++) {
+                    int i = uf.find(v), j = uf.find(w); //posible O(1)
+                    if (i == j) continue;
+                    Edge e = edgeArray[v + w * size];
+                    if (lowerWeight[i].weight == e.weight) closest[i].add(e);
+                    if (lowerWeight[j].weight == e.weight) closest[j].add(e);
+                }
+            }
+
+            ArrayList<ArrayList<Edge>> CC_edges = new ArrayList<>();
+            for (int i = 0; i < size; i++) {
+                if (closest[i].size() != 0) CC_edges.add(closest[i]);
+            }
+
+            if (alt == 1) CC_edges.sort((a, b) -> Integer.compare(a.size(), b.size()));
+            if (alt == 2) CC_edges.sort((a, b) -> Integer.compare(-a.size(), -b.size()));
+            if (alt == 3) Collections.shuffle(CC_edges);
+            if (alt == 4) {
+                CC_edges = new ArrayList<>();
+                for (int i = size - 1; i >= 0; i--) {
+                    if (closest[i].size() != 0) CC_edges.add(closest[i]);
+                }
+            }
+            if (alt == 5) CC_edges.sort((a, b) -> Integer.compare(Math.min(a.size(), 2), Math.min(b.size(), 2)));
+
+            // add newly discovered edges to MST
+            //for (int i = 0; i < graphSize; i++) { //O(V)
+            for (ArrayList<Edge> candidates : CC_edges) { //O(V)
+                //Edge e = closest[i];
+                //ArrayList<Edge> candidates = closest[i];
+                if (candidates.size() != 0) {
+                    //Collections.sort(candidates); // O(V'*log(V')) -> O(V') en ne gardant que la maximum
+                    Edge e = candidates.get(0);
+                    for (Edge o : candidates) {
+                        if (uf.find(o.v) != uf.find(o.w) && nodesDegree[e.v] + nodesDegree[e.w] < nodesDegree[o.v] + nodesDegree[o.w]) {
+                            e = o;
+                        }
+                    }
+
+                    int v = e.v, w = e.w;
+                    // don't add the same edge twice
+                    if (uf.find(v) != uf.find(w)) {
+                        addEdge(e);
+                        //uf.union(v, w);
+                        uf.union_complete(v, w);
+                    }
+                }
+            }
         }
-
         // create the parent[] array
         mstAdjList.clear();
         for (int i = 0; i < size; i++) visited[i] = false;
@@ -137,19 +238,20 @@ public class KruskalCCT {
     }
 
     /**
-     * Add edge e to the mst
+     * Add edge (i,j) to the mst
      *
-     * @param e new edge of the MST
+     * @param i first end point of the edge
+     * @param j second end point of the edge
      */
     private void addEdge(Edge e) {
         nodesDegree[e.v] += 1;
         nodesDegree[e.w] += 1;
-        cost += e.weight;
         mst.add(e);
+        cost += e.weight;
     }
 
     /**
-     * Add mandatory (store in mandatoryEdges) edges adjacent with node i.
+     * Add mandatory edges of the MST.
      */
     private void addMandatoryEdges() {
         for (int i = 1; i < mandatoryEdges.length; i++) {
@@ -271,3 +373,4 @@ public class KruskalCCT {
     }
 
 }
+

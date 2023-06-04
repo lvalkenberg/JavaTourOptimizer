@@ -1,6 +1,8 @@
 package util;
 
-// https://algs4.cs.princeton.edu/15uf/UF.java.html
+/**
+ * source : https://algs4.cs.princeton.edu/15uf/UF.java.html
+ */
 public class UF {
 
     private int[] parent;  // parent[i] = parent of i
@@ -12,7 +14,7 @@ public class UF {
      * {@code n} elements {@code 0} through {@code n-1}.
      * Initially, each element is in its own set.
      *
-     * @param  n the number of elements
+     * @param n the number of elements
      * @throws IllegalArgumentException if {@code n < 0}
      */
     public UF(int n) {
@@ -27,9 +29,20 @@ public class UF {
     }
 
     /**
+     * Reset the data structure
+     */
+    public void reset() {
+        count = parent.length;
+        for (int i = 0; i < count; i++) {
+            parent[i] = i;
+            rank[i] = 0;
+        }
+    }
+
+    /**
      * Returns the canonical element of the set containing element {@code p}.
      *
-     * @param  p an element
+     * @param p an element
      * @return the canonical element of the set containing {@code p}
      * @throws IllegalArgumentException unless {@code 0 <= p < n}
      */
@@ -54,15 +67,13 @@ public class UF {
     /**
      * Returns true if the two elements are in the same set.
      *
-     * @param  p one element
-     * @param  q the other element
+     * @param p one element
+     * @param q the other element
      * @return {@code true} if {@code p} and {@code q} are in the same set;
-     *         {@code false} otherwise
+     * {@code false} otherwise
      * @throws IllegalArgumentException unless
-     *         both {@code 0 <= p < n} and {@code 0 <= q < n}
-     * @deprecated Replace with two calls to {@link #find(int)}.
+     *                                  both {@code 0 <= p < n} and {@code 0 <= q < n}
      */
-    @Deprecated
     public boolean connected(int p, int q) {
         return find(p) == find(q);
     }
@@ -71,10 +82,10 @@ public class UF {
      * Merges the set containing element {@code p} with the
      * the set containing element {@code q}.
      *
-     * @param  p one element
-     * @param  q the other element
+     * @param p one element
+     * @param q the other element
      * @throws IllegalArgumentException unless
-     *         both {@code 0 <= p < n} and {@code 0 <= q < n}
+     *                                  both {@code 0 <= p < n} and {@code 0 <= q < n}
      */
     public void union(int p, int q) {
         int rootP = find(p);
@@ -82,7 +93,7 @@ public class UF {
         if (rootP == rootQ) return;
 
         // make root of smaller rank point to root of larger rank
-        if      (rank[rootP] < rank[rootQ]) parent[rootP] = rootQ;
+        if (rank[rootP] < rank[rootQ]) parent[rootP] = rootQ;
         else if (rank[rootP] > rank[rootQ]) parent[rootQ] = rootP;
         else {
             parent[rootQ] = rootP;
@@ -94,9 +105,9 @@ public class UF {
     public void union_complete(int p, int q) { //O(n)
         int src = find(p);
         int otherSrc = find(q);
-        for(int i=0;i<parent.length;i++){
+        for (int i = 0; i < parent.length; i++) {
             int srcI = find(i);
-            if(srcI == src || srcI == otherSrc){
+            if (srcI == src || srcI == otherSrc) {
                 parent[i] = src;
                 rank[i] = 0;
             }
@@ -108,12 +119,12 @@ public class UF {
     private void validate(int p) {
         int n = parent.length;
         if (p < 0 || p >= n) {
-            throw new IllegalArgumentException("index " + p + " is not between 0 and " + (n-1));
+            throw new IllegalArgumentException("index " + p + " is not between 0 and " + (n - 1));
         }
     }
 
     //clone
-    public UF clone(){
+    public UF clone() {
         UF clone = new UF(this.count);
         clone.parent = this.parent.clone();
         clone.rank = this.rank.clone();

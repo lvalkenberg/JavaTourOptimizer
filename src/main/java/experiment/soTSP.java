@@ -1,4 +1,4 @@
-package other;// simple exact Solver.TSP solver based on branch-and-bound/Held--Karp
+package experiment;// simple exact Solver.TSP solver based on branch-and-bound/Held--Karp
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -7,10 +7,7 @@ import org.w3c.dom.NodeList;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
+import java.io.*;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.PriorityQueue;
@@ -45,18 +42,18 @@ public class soTSP {
         System.err.printf("%n");
         soTSP tsp = new soTSP();
         //tsp.readInput(new InputStreamReader(System.in));
-        tsp.xmlReader("../TSPlib/xml files/ulysses16.xml");
+        tsp.readInput("../TSPlib/tsp files/lin105.tsp");
 
         long start = System.nanoTime();
         tsp.solve();
-        if(tsp.verbose) System.out.println("\nSolved in " + (System.nanoTime() - start)/1e6 + " ms");
+        if (tsp.verbose) System.out.println("\nSolved in " + (System.nanoTime() - start) / 1e6 + " ms");
     }
 
     /**
      * EUC_2D .tsp reader
      */
-    public void readInput(Reader r) throws IOException {
-        BufferedReader in = new BufferedReader(r);
+    public void readInput(String filePath) throws IOException {
+        BufferedReader in = new BufferedReader(new FileReader(filePath));
         Pattern specification = Pattern.compile("\\s*([A-Z_]+)\\s*(:\\s*([0-9]+))?\\s*");
         Pattern data = Pattern.compile("\\s*([0-9]+)\\s+([-+.0-9Ee]+)\\s+([-+.0-9Ee]+)\\s*");
         String line;
@@ -83,7 +80,8 @@ public class soTSP {
                     for (int j = 0; j < n; j++) {
                         double dx = x[i] - x[j];
                         double dy = y[i] - y[j];
-                        cost[i][j] = Math.rint(Math.sqrt(dx * dx + dy * dy));
+                        //cost[i][j] = Math.rint(Math.sqrt(dx * dx + dy * dy));
+                        cost[i][j] = Math.round(Math.sqrt(dx * dx + dy * dy) * 1e7) / 1e7;
                     }
                 }
             }
@@ -93,11 +91,12 @@ public class soTSP {
     /**
      * Read Solver.TSP Instance from xml
      * See http://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/XML-TSPLIB/Description.pdf
+     *
      * @param xmlPath path to the file
      */
-    public void xmlReader(String xmlPath){
+    public void xmlReader(String xmlPath) {
         String[] elem = xmlPath.split("/");
-        this.name = elem[elem.length-1].split("[.]")[0];
+        this.name = elem[elem.length - 1].split("[.]")[0];
         // Instantiate the Factory
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
@@ -147,20 +146,21 @@ public class soTSP {
         visited_node = 0;
         do {
             do {
-                visited_node ++;
+                visited_node++;
                 int i = -1;
                 for (int j = 0; j < n; j++) {
-                    if (currentNode.degree[j] > 2 && (i < 0 || currentNode.degree[j] < currentNode.degree[i])) i = j; // branch sur le plus petit degrée supérieur à 2
+                    if (currentNode.degree[j] > 2 && (i < 0 || currentNode.degree[j] < currentNode.degree[i]))
+                        i = j; // branch sur le plus petit degrée supérieur à 2
                 }
                 if (i < 0) {
                     if (currentNode.lowerBound < bestNode.lowerBound) {
                         bestNode = currentNode;
-                        if(verbose) System.out.println("upper bound : " + bestNode.lowerBound);
-                        if(verbose) System.err.printf("%f", bestNode.lowerBound);
+                        if (verbose) System.out.println("upper bound : " + bestNode.lowerBound);
+                        if (verbose) System.err.printf("%f", bestNode.lowerBound);
                     }
                     break;
                 }
-                if(verbose) System.err.printf(".");
+                if (verbose) System.err.printf(".");
                 PriorityQueue<Node> children = new PriorityQueue<Node>(11, new NodeComparator());
                 children.add(exclude(currentNode, i, currentNode.parent[i])); // branching exclude each node
                 for (int j = 0; j < n; j++) {
@@ -169,25 +169,26 @@ public class soTSP {
                 currentNode = children.poll();
                 pq.addAll(children); // optimised ?
             } while (currentNode.lowerBound < bestNode.lowerBound); // mix DFS / BFS
-            if(verbose) System.err.printf("%n");
+            if (verbose) System.err.printf("%n");
             currentNode = pq.poll();
         } while (currentNode != null && currentNode.lowerBound < bestNode.lowerBound);
         // output suitable for gnuplot
         // set style data vector
-        if(verbose) System.out.println("---------------------------");
-        if(verbose) System.out.println("-> optimum found : " + bestNode.lowerBound);
-        if(verbose) System.out.println("-> " + visited_node + " nodes visisted");
+        if (verbose) System.out.println("---------------------------");
+        if (verbose) System.out.println("-> optimum found : " + bestNode.lowerBound);
+        if (verbose) System.out.println("-> " + visited_node + " nodes visisted");
         int j = 0;
         do {
             int i = bestNode.parent[j];
             //System.out.printf("%f\t%f\t%f\t%f%n", x[j], y[j], x[i] - x[j], y[i] - y[j]);
-            if(verbose) System.out.printf("(%d,%d) ",j,i);
+            if (verbose) System.out.printf("(%d,%d) ", j, i);
             j = i;
         } while (j != 0);
     }
 
     /**
      * Exclude a edge from the Solver.TSP
+     *
      * @param node
      * @param i
      * @param j
@@ -210,7 +211,8 @@ public class soTSP {
         node.degree = new int[n];
         node.parent = new int[n];
         double lambda = 0.1;
-        while (lambda > 1e-06) {
+        double eps = 1e-06;
+        while (lambda > eps) {
             double previousLowerBound = node.lowerBound;
             computeOneTree(node);
             if (!(node.lowerBound < bestNode.lowerBound)) return; // retour direct si meilleure LB TODO : impact
@@ -231,7 +233,8 @@ public class soTSP {
         node.lowerBound = 0.0;
         Arrays.fill(node.degree, 0);
         for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) costWithPi[i][j] = node.excluded[i][j] ? Double.MAX_VALUE : cost[i][j] + node.pi[i] + node.pi[j];
+            for (int j = 0; j < n; j++)
+                costWithPi[i][j] = node.excluded[i][j] ? Double.MAX_VALUE : cost[i][j] + node.pi[i] + node.pi[j];
         }
         int firstNeighbor;
         int secondNeighbor;
@@ -289,7 +292,7 @@ public class soTSP {
 
     // getters
 
-    public double getLB(){
+    public double getLB() {
         return bestNode.lowerBound;
     }
 }

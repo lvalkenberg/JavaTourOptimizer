@@ -9,25 +9,25 @@ import util.UF;
  * weighted spanning tree constraint, J-C Régin.)
  */
 public class CCTree {
-    int elementCounter;
-    int size;
-    int[] inorder;
-    int[] pos;
-    int[] depth;
-    CCTNode[] tree; // contain the nodes of the ccTree
-    int[] p; // pointer the root node of the connected component (index of vallue[])
-    int globalCounter = 0;
+    private int elementCounter;
+    private int size;
+    private int[] inorder;
+    private int[] pos;
+    private int[] depth;
+    public CCTNode[] tree; // contain the nodes of the ccTree
+    private int[] pointer; // pointer the root node of the connected component (index of vallue[])
+    private int globalCounter = 0;
 
-    int[] log2Array;
-    int[] pow2Array;
-    int[][] M;
+    private int[] log2Array;
+    private int[] pow2Array;
+    private int[][] M;
 
-    UF uf;
+    private UF uf;
 
     /**
      * ccTree constructor.
      *
-     * @param numberOfLeaf  Number of node in the graph
+     * @param numberOfLeaf Number of node in the graph
      */
     public CCTree(int numberOfLeaf) {
         if (numberOfLeaf < 2) throw new IllegalArgumentException();
@@ -38,14 +38,14 @@ public class CCTree {
         this.pos = new int[size];
         this.depth = new int[size];
         this.tree = new CCTNode[size];
-        this.p = new int[numberOfLeaf];
+        this.pointer = new int[numberOfLeaf];
         this.log2Array = new int[size + 1];
         this.pow2Array = new int[(int) (Math.log(size) / Math.log(2)) + 1];
         this.M = new int[size][];
 
         for (int i = 0; i < numberOfLeaf; i++) {
             tree[i] = new CCTNode(i, i);
-            p[i] = i;
+            pointer[i] = i;
         }
 
         for (int i = 0; i < size; i++) {
@@ -66,23 +66,21 @@ public class CCTree {
     /**
      * Update the CCTree when a new edge of the MST
      *
-     * @param v      first node of the edge
-     * @param w      second node of the edge
      * @param newEdge the new edge.
      */
-    public void updateCCTree(int v, int w, Edge newEdge) { // TOD : simplify
-        int rv = uf.find(v);
-        int rw = uf.find(w);
+    public void updateCCTree(Edge newEdge) {
+        int rv = uf.find(newEdge.v);
+        int rw = uf.find(newEdge.w);
         uf.union(rv, rw);
 
         elementCounter++;
 
-        CCTNode left = tree[p[rv]];
-        CCTNode right = tree[p[rw]];
+        CCTNode left = tree[pointer[rv]];
+        CCTNode right = tree[pointer[rw]];
         CCTNode newNode = new CCTNode(left, right, newEdge, elementCounter);
 
-        p[rv] = elementCounter;
-        p[rw] = elementCounter; // rv or rw will be the new canonical element
+        pointer[rv] = elementCounter;
+        pointer[rw] = elementCounter; // rv or rw will be the new canonical element
         tree[elementCounter] = newNode;
     }
 
@@ -91,23 +89,23 @@ public class CCTree {
      */
     public void travelCCTree() {
         globalCounter = 0;
-        CCTNode root = tree[elementCounter]; // last added value is the root of the tree
-        inorderTravelling(root, size);
+        CCTNode root = tree[elementCounter];
+        inorderTravelling(root, 0);
     }
 
     /**
      * Inorder visit of the ccTree.
      *
      * @param node node to visit.
-     * @param h    height of the node.
+     * @param d    depth of the node.
      */
-    private void inorderTravelling(CCTNode node, int h) {
-        if (node.left != null) inorderTravelling(node.left, h + 1);
+    private void inorderTravelling(CCTNode node, int d) {
+        if (node.left != null) inorderTravelling(node.left, d + 1);
         inorder[globalCounter] = node.index;
-        depth[globalCounter] = h;
+        depth[globalCounter] = d;
         pos[node.index] = globalCounter;
         globalCounter++;
-        if (node.right != null) inorderTravelling(node.right, h + 1);
+        if (node.right != null) inorderTravelling(node.right, d + 1);
 
     }
 
@@ -169,8 +167,8 @@ class CCTNode {
     /**
      * Leaf constructor
      *
-     * @param vetice    node id
-     * @param index     index in tree[]
+     * @param vetice node id
+     * @param index  index in tree[]
      */
     public CCTNode(int vetice, int index) {
         this.isLeaf = true;
