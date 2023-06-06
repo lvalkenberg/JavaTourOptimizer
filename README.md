@@ -2,7 +2,7 @@
 This repository is a Java exact solver for the Travelling Salesman Problem ([TSP](https://en.wikipedia.org/wiki/Travelling_salesman_problem)). The core solver use a branch-and-bound with the a [1-tree based Lagrangian relaxation]([The Traveling-Salesman Problem and Minimum Spanning Trees](https://www.jstor.org/stable/169411)) as presented by M. Held and R. M. Karp. Other algorithms and heuristics are use with the goal of speed up the search of an optimum TSP tour or at least find a good tour rapidly.
 
 ## Installation
-
+ 
 The [build.gradle](build.gradle) file is given and can be used to open the project in your IDE (Intellij for exemple).  
 
 The project is also hosted as a library on [Maven Central](https://central.sonatype.com/artifact/io.github.lvalkenberg.javaTourOptimizer/javaTourOptimizer/1.0). It can be easily imported on your existing project.
