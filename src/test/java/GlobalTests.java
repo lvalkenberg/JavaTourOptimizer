@@ -15,9 +15,8 @@ public class GlobalTests {
         String[] searchStrategies = {"BFS", "DFS", "DFS on BFS"};
         double[] TSPtour = {937, 2020, 6859};
 
-        int i = -1;
+        int i = 0;
         for (String instance : instances) {
-            i++;
             for (boolean filter : booleanOptions) {
                 for (String branchingStrategy : branchingStrategies) {
                     for (String searchStrategy : searchStrategies) {
@@ -63,6 +62,7 @@ public class GlobalTests {
                 }
 
             }
+            i++;
         }
     }
 
