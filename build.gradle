@@ -75,6 +75,10 @@ publishing {
     }
     repositories {
         maven {
+            credentials {
+                username = findProperty('ossrhUsername') ?: ''
+                password = findProperty('ossrhPassword') ?: ''
+            }
             url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
             credentials {
                 username = ossrhUsername
