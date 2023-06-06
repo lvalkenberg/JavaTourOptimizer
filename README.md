@@ -3,7 +3,9 @@ This repository is a Java exact solver for the Travelling Salesman Problem ([TSP
 
 ## Installation
 
-The [build.gradle](build.gradle) file is given and can be used to open the project in your IDE (Intellij for exemple) .
+The [build.gradle](build.gradle) file is given and can be used to open the project in your IDE (Intellij for exemple).  
+
+The project is also hosted as a library on [Maven Central](https://central.sonatype.com/artifact/io.github.lvalkenberg.javaTourOptimizer/javaTourOptimizer/1.0). It can be easily imported on your existing project.
 
 ## Usage
 Simple creation of an instance with the best parameter:
