@@ -2,7 +2,11 @@ plugins {
     id 'java-library'
 }
 
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
 group 'io.github.lvalkenberg.javaTourOptimizer'
+archivesBaseName = "lvalkenberg-JavaTourOptimizer"
 version '1.0'
 
 repositories {
@@ -16,4 +20,70 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            artifact sourcesJar
+            artifact javadocJar
+
+            pom {
+                name = 'JavaTourOptimizer'
+                packaging = 'jar'
+                description = 'Travelling Salesman Problem solver'
+                url = 'https://github.com/lvalkenberg/JavaTourOptimizer'
+
+                scm {
+                    connection = 'scm:git:git://github.com/lvalkenberg/JavaTourOptimizer.git'
+                    developerConnection = 'scm:git:ssh://github.com/lvalkenberg/JavaTourOptimizer.git'
+                    url = 'https://github.com/lvalkenberg/JavaTourOptimizer'
+                }
+
+                licenses {
+                    license {
+                        name = 'The MIT License'
+                        url = 'http://opensource.org/licenses/MIT'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'lvalkenberg'
+                        name = 'Valkenberg'
+                        email = 'louis.valkenberg28@gmail.com'
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = ossrhUsername
+                password = ossrhPassword
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
 }

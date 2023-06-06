@@ -72,6 +72,9 @@ public class KruskalCCT {
     /**
      * Compute the mst based on the distance matrix, including
      * the mandatory edges. Based on the Kruskal MST algorithm
+     *
+     * @param distanceMatrix    matrix distance
+     * @param mandatoryEdges    mandatory edges include in every MST
      */
     public void computeMST(double[][] distanceMatrix, int[][] mandatoryEdges) {
         this.distanceMatrix = distanceMatrix;
@@ -172,7 +175,7 @@ public class KruskalCCT {
     /**
      * Compute the support edge for each non minimum 1-tree edge of the current node.
      *
-     * @return a hashmap : support edge -> non MST edges
+     * @return a hashmap = support edge : non MST edges
      */
     public HashMap<Edge, ArrayList<Edge>> computeAllSupportEdges() {
         // construct the CCT (add  edges in increasing weight order)

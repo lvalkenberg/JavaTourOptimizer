@@ -274,7 +274,7 @@ public class MaxDegTwoMST {
     /**
      * Compute the support edge for each non minimum 1-tree edge of the current node.
      *
-     * @return a hashmap : support edge -> non MST edges
+     * @return a hashmap = support edge : non MST edges
      */
     public HashMap<Edge, ArrayList<Edge>> computeAllSupportEdges() {
         // construct the CCT (add  edges in increasing weight order)

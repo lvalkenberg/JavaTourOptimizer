@@ -18,7 +18,8 @@ public class UFTree {
      * {@code n} elements {@code 0} through {@code n-1}.
      * Initially, each element is in its own set.
      *
-     * @param  n the number of elements
+     * @param  n    the number of elements
+     * @param depth depth of the UF element in the CCTree
      * @throws IllegalArgumentException if {@code n < 0}
      */
     public UFTree(int n, int[] depth) {

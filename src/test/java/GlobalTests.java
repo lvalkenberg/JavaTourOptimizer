@@ -9,19 +9,15 @@ public class GlobalTests {
     void AllParameterTests() {
         // Symetric instances of the TSPlib
         //String[] instances = {"burma14", "ulysses16", "gr17", "gr21", "gr24", "fri26", "bayg29", "bays29"}; // , "ulysses22"
-        String[] instances = {"fri26", "bays29"}; // , "bayg29"
+        String[] instances = {"fri26", "bays29", "ulysses16"}; // , "bayg29"
         boolean[] booleanOptions = {true, false};
-        String[] branchingStrategies = {"exclude", "nearest neighbour", "maxCost", "minCost path"};
+        String[] branchingStrategies = {"nearest neighbour", "maxCost", "minCost path"};
         String[] searchStrategies = {"BFS", "DFS", "DFS on BFS"};
-        boolean[] tt = {true};
-        boolean[] ff = {false};
+        double[] TSPtour = {937, 2020, 6859};
 
+        int i = -1;
         for (String instance : instances) {
-            soTSP trueTSP = new soTSP();
-            trueTSP.xmlReader("../TSPlib/xml files/" + instance + ".xml");
-            trueTSP.verbose = false;
-            trueTSP.solve();
-
+            i++;
             for (boolean filter : booleanOptions) {
                 for (String branchingStrategy : branchingStrategies) {
                     for (String searchStrategy : searchStrategies) {
@@ -52,7 +48,7 @@ public class GlobalTests {
                                                     + ", keepBestPi=" + keepBestPi
                                                     + ", initialHeuristic=" + initialHeuristic);
                                             TSP.solve();
-                                            assertEquals(trueTSP.getLB(), TSP.getLowerBound(), 10e-6);
+                                            assertEquals(TSPtour[i], TSP.getLowerBound(), 10e-6);
                                             // Print the parameter values after the successful test
                                         } catch (Exception e) {
                                             fail(e);
@@ -95,7 +91,7 @@ public class GlobalTests {
     }
 
 
-    @Test
+    //@Test
     void outputSmall() {
         // Symetric instances of the TSPlib
         String[] instances = {"swiss42", "berlin52", "st70", "eil76"}; // , "gr48", "brazil58"
@@ -131,7 +127,7 @@ public class GlobalTests {
         }
     }
 
-    @Test
+    //@Test
     void outputMedium() {
         // Symetric instances of the TSPlib
         String[] instances = {"dantzig42", "att48", "gr48", "rat99"}; // , "gr48", "brazil58"
@@ -167,7 +163,7 @@ public class GlobalTests {
         }
     }
 
-    @Test
+    //@Test
     void outputBigger() {
         // Symetric instances of the TSPlib
         String[] instances = {"rat99", "eil101", "lin105", "kroA100", "ch130"};

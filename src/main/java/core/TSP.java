@@ -212,6 +212,7 @@ public class TSP {
      * EUC_2D .tsp reader (http://comopt.ifi.uni-heidelberg.de/software/TSPLIB95/tsp95.pdf)
      *
      * @param filePath complete path of the .tsp file
+     * @throws IOException Error with the provided path
      */
     public void readInput(String filePath) throws IOException {
         BufferedReader in = new BufferedReader(new FileReader(filePath));

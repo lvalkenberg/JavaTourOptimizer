@@ -51,6 +51,9 @@ public class soTSP {
 
     /**
      * EUC_2D .tsp reader
+     *
+     * @param filePath path the the file to read .tsp format EUC_2D
+     * @throws IOException Error with the provided path
      */
     public void readInput(String filePath) throws IOException {
         BufferedReader in = new BufferedReader(new FileReader(filePath));
