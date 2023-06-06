@@ -46,6 +46,7 @@ public class GlobalTests {
                                                     + ", incrementalPi=" + incrementalPi
                                                     + ", keepBestPi=" + keepBestPi
                                                     + ", initialHeuristic=" + initialHeuristic);*/
+                                            System.out.println(TSP.getLowerBound());
                                             TSP.solve();
                                             assertEquals(TSPtour[i], TSP.getLowerBound(), 10e-6);
                                             // Print the parameter values after the successful test
