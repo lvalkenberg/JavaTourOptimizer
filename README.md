@@ -15,7 +15,7 @@ TSP tsp = new TSP("pla85900.xml");
 TSP tsp = new TSP("pla85900.tsp");
 
 // Or from a distance matrice
-double[] distanceMatrix;
+double[][] distanceMatrix;
 TSP tsp = new TSP(distanceMatrix);
 ```
 Solve the TSP instance :
@@ -24,7 +24,7 @@ tsp.solve();
 ```
 A builder class *TSPBuilder* allow to give specific solving parameters a TSP instance. These parameters will change the background behavior of the solver. Here a the most interesting parameters
 ```java
-TSP.TSPBuilder tspSolver = new TSP.TSPBuilder()
+TSP.TSPBuilder tspBuilder = new TSP.TSPBuilder()
                 .setMargCostFilter(boolean margCostFilter)                        // apply marginal cost filtering
                 .setRepCostFilter(boolean repCostFilter)                          // apply replacement cost filtering
                 .setBranchingStrategy(String branchingStrategy)                   // branching strategy (maxCost, minCost, nearest neighbour, minCost path)
@@ -32,8 +32,10 @@ TSP.TSPBuilder tspSolver = new TSP.TSPBuilder()
                 .setLastConflictSearch(boolean lastConflictSearch)                // use last conflict search
                 .setIncrementalPi(boolean incrementalPi)                          // reuse the parent Lagrangian multiplier
                 .setInitialHeuristic(boolean initialHeuristic)                    // heuristic to find a initial solution used a upper bound
-                .setTimeout(int timeout);                                         // timeout in second
+                .setTimeout(double timeout);                                         // timeout in second
                 .setOnBetterSolutionFound(Consumer<int[]> onBetterSolutionFound)  // callback function all each time a new tour is found
+
+TSP tsp = new TSP(tspBuilder, "pla85900.tsp");
 ```
 ## License
 
