@@ -39,14 +39,14 @@ public class GlobalTests {
                                                     .setInitialHeuristic(initialHeuristic)
                                                     .build("../TSPlib/xml files/" + instance + ".xml");
 
-                                            System.out.println(instance + " : "
+                                            /*System.out.println(instance + " : "
                                                     + "filter=" + filter
                                                     + ", branchingStrategy=" + branchingStrategy
                                                     + ", searchStrategy=" + searchStrategy
                                                     + ", lastConflictSearch=" + lastConflictSearch
                                                     + ", incrementalPi=" + incrementalPi
                                                     + ", keepBestPi=" + keepBestPi
-                                                    + ", initialHeuristic=" + initialHeuristic);
+                                                    + ", initialHeuristic=" + initialHeuristic);*/
                                             TSP.solve();
                                             assertEquals(TSPtour[i], TSP.getLowerBound(), 10e-6);
                                             // Print the parameter values after the successful test
@@ -82,7 +82,7 @@ public class GlobalTests {
                 TSP TSP = new TSP("../TSPlib/xml files/" + instance + ".xml");
                 TSP.verbose = false;
                 TSP.solve();
-                System.out.println(instance + " : " + TSP.getLowerBound());
+                //System.out.println(instance + " : " + TSP.getLowerBound());
                 assertEquals(trueTSP.getLB(), TSP.getLowerBound(), 10e-6);
             } catch (Exception e) {
                 fail(e);
