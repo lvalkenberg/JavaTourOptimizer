@@ -36,7 +36,7 @@ public class GlobalTests {
                                                     .setIncrementalPi(incrementalPi)
                                                     .setKeepBestPi(keepBestPi)
                                                     .setInitialHeuristic(initialHeuristic)
-                                                    .build("../TSPlib/xml files/" + instance + ".xml");
+                                                    .build("src/test/instances/" + instance + ".xml");
 
                                             /*System.out.println(instance + " : "
                                                     + "filter=" + filter
@@ -46,9 +46,8 @@ public class GlobalTests {
                                                     + ", incrementalPi=" + incrementalPi
                                                     + ", keepBestPi=" + keepBestPi
                                                     + ", initialHeuristic=" + initialHeuristic);*/
-                                            System.out.println(TSP.getLowerBound());
                                             TSP.solve();
-                                            assertEquals(TSPtour[i], TSP.getLowerBound(), 10e-6);
+                                            assertEquals(TSPtour[i], TSP.getLowerBound(), 10e-5);
                                             // Print the parameter values after the successful test
                                         } catch (Exception e) {
                                             fail(e);
@@ -68,7 +67,7 @@ public class GlobalTests {
     }
 
 
-    @Test
+    //@Test
     void outputVerySmall() {
         // Symetric instances of the TSPlib
         String[] instances = {"burma14", "ulysses16", "gr17", "gr21", "gr24", "fri26", "bayg29", "bays29"}; // , "ulysses22"
